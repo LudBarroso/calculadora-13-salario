@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de 13º Salário • Estimativa</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2b; --muted:#8ea2c3; --accent:#4aa3ff; --ok:#18b86a;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:linear-gradient(180deg,#081022,#0d1730 40%,#0b1220); color:#e8f0ff}
+    header{padding:24px 16px; text-align:center}
+    h1{margin:0; font-size:clamp(1.25rem,2.8vw,1.8rem)}
+    p.sub{margin:.5rem auto 0; color:var(--muted)}
+    .wrap{max-width:1000px; margin:24px auto 64px; padding:0 16px}
+    .grid{display:grid; grid-template-columns:1fr; gap:16px}
+    @media(min-width:900px){ .grid{grid-template-columns:1.1fr .9fr} }
+    .card{background:linear-gradient(180deg,#0f1a2e,#0d192d 60%,#0c1729); border:1px solid rgba(255,255,255,.07); border-radius:16px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card h2{margin:.2rem 0 1rem; font-size:1.1rem; letter-spacing:.2px; color:#d9e6ff}
+    label{display:block; font-size:.9rem; color:#cfe0ff; margin:.35rem 0 .35rem}
+    input, select{width:100%; padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.1); background:#0b1425; color:#e8f0ff; outline:none}
+    .row{display:grid; grid-template-columns:1fr; gap:12px}
+    @media(min-width:600px){ .row{grid-template-columns:1fr 1fr} }
+    .hint{font-size:.8rem; color:var(--muted)}
+    .kpi{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-radius:12px; background:#0a1323; border:1px solid rgba(255,255,255,.07); margin-bottom:10px}
+    .kpi .val{font-variant-numeric:tabular-nums; font-size:1.1rem}
+    .accent{color:var(--accent)}
+    .ok{color:var(--ok)}
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    button{background:var(--accent); color:#031027; border:0; border-radius:12px; padding:12px 16px; font-weight:700; cursor:pointer}
+    button.secondary{background:#162744; color:#d7e6ff}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Calculadora de 13º Salário (Estimativa)</h1>
+    <p class="sub">Use para ter uma <b>previsão</b> do 13º. Regras simplificadas: meses com <b>≥ 15 dias</b> contam; afastamento por <b>auxílio-doença</b> não conta no 13º do empregador (o INSS paga a parte). IRRF e INSS são calculados pela tabela mensal e <span class="tag">Desconto Simplificado R$ 607,20</span> opcional.</p>
+  </header>
+
+  <div class="wrap grid">
+    <section class="card">
+      <h2>Entradas</h2>
+      <div class="row">
+        <div>
+          <label for="year">Ano de referência</label>
+          <input id="year" type="number" min="2000" max="2100" />
+        </div>
+        <div>
+          <label for="salary">Salário base (R$)</label>
+          <input id="salary" type="number" step="0.01" min="0" placeholder="Ex.: 3500,00" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="admission">Data de admissão</label>
+          <input id="admission" type="date" />
+          <div class="hint">Meses com 15 dias ou mais serão contados.</div>
+        </div>
+        <div>
+          <label for="advanced1">Adiantou 1ª parcela nas férias?</label>
+          <select id="advanced1">
+            <option value="nao" selected>Não</option>
+            <option value="sim">Sim (50% adiantado)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="inssMonths">Afastamento pelo INSS (auxílio-doença) — meses no ano</label>
+          <input id="inssMonths" type="number" min="0" step="1" value="0" />
+          <div class="hint">Esses meses <b>não</b> contam para o 13º do empregador.</div>
+        </div>
+      </div>
+
+      <div class="btns" style="margin-top:14px">
+        <button id="calcBtn">Calcular</button>
+        <button id="clearBtn" class="secondary">Limpar</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Resultado</h2>
+      <div class="kpi"><span>Meses que contam</span> <span class="val" id="monthsOut">—</span></div>
+      <div class="kpi"><span>13º <b class="accent">Bruto</b></span> <span class="val" id="brutoOut">—</span></div>
+      <div class="kpi"><span>INSS sobre 13º</span> <span class="val" id="inssOut">—</span></div>
+      <div class="kpi"><span>Base de IRRF (após INSS)</span> <span class="val" id="baseIrOut">—</span></div>
+      <div class="kpi"><span>IRRF sobre 13º</span> <span class="val" id="irrfOut">—</span></div>
+      <div class="kpi"><span>1ª parcela (se adiantada)</span> <span class="val" id="parc1Out">—</span></div>
+      <div class="kpi"><span>2ª parcela <b class="ok">Líquida</b></span> <span class="val" id="parc2Out">—</span></div>
+      <div class="kpi"><span>Total líquido no ano (1ª + 2ª)</span> <span class="val" id="totalOut">—</span></div>
+    </section>
+  </div>
+
+<script>
+  const fmt = (v)=> isNaN(v) ? '—' : v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const el = id=>document.getElementById(id);
+
+  function countEligibleMonths(admissionStr, year){
+    if(!admissionStr) return 12;
+    const adm = new Date(admissionStr);
+    const y = Number(year);
+    const start = new Date(Math.max(adm.getTime(), new Date(y,0,1).getTime()));
+    let months = 0;
+    for(let m=0;m<12;m++){
+      const first = new Date(y,m,1);
+      const last = new Date(y,m+1,0);
+      const from = new Date(Math.max(first.getTime(), start.getTime()));
+      const to = last;
+      const daysWorked = (to - from)/(1000*60*60*24) + 1;
+      if(from <= to && daysWorked >= 15) months++;
+    }
+    return months;
+  }
+
+  function recalc(){
+    const year = Number(el('year').value || new Date().getFullYear());
+    const salary = Number(el('salary').value||0);
+    const admission = el('admission').value;
+    const advanced = el('advanced1').value === 'sim';
+    let inssMonths = Number(el('inssMonths').value||0);
+
+    let months = countEligibleMonths(admission, year);
+    months = Math.max(0, Math.min(12, months - inssMonths));
+
+    const bruto = salary * (months/12);
+
+    const inssBr = [
+      {limit:1518.00, rate:0.075},
+      {limit:2793.88, rate:0.09},
+      {limit:4190.83, rate:0.12},
+      {limit:8157.41, rate:0.14}
+    ];
+
+    const irrfBr = [
+      {from:0.00, rate:0.00, ded:0.00},
+      {from:2428.80, rate:0.075, ded:182.16},
+      {from:2826.66, rate:0.15, ded:394.16},
+      {from:3751.06, rate:0.225, ded:675.49},
+      {from:4664.68, rate:0.275, ded:908.73}
+    ];
+
+    function calcINSSProgressive(base){
+      let remaining = base; let prev=0; let total=0;
+      for(const br of inssBr){
+        const faixa = Math.max(0, Math.min(remaining, br.limit - prev));
+        if(faixa>0){ total += faixa * br.rate; prev = br.limit; remaining -= faixa; }
+      }
+      return total;
+    }
+
+    function calcIRRF(base){
+      let rate=0, ded=0;
+      for(const br of irrfBr){ if(base >= br.from){ rate = br.rate; ded = br.ded; } }
+      return Math.max(0, base * rate - ded);
+    }
+
+    const inss = calcINSSProgressive(bruto);
+    let baseIR = Math.max(0, bruto - inss);
+    const irrfNormal = calcIRRF(baseIR);
+    const irrfSimpl = calcIRRF(Math.max(0, baseIR - 607.20));
+    const irrf = Math.min(irrfNormal, irrfSimpl);
+
+    const primeira = advanced ? (bruto * 0.5) : 0;
+    const segundaLiquida = Math.max(0, (bruto - primeira) - inss - irrf);
+    const totalLiquido = primeira + segundaLiquida;
+
+    el('monthsOut').textContent = months;
+    el('brutoOut').textContent = fmt(bruto);
+    el('inssOut').textContent = fmt(inss);
+    el('baseIrOut').textContent = fmt(baseIR);
+    el('irrfOut').textContent = fmt(irrf);
+    el('parc1Out').textContent = primeira ? fmt(primeira) : '—';
+    el('parc2Out').textContent = fmt(segundaLiquida);
+    el('totalOut').textContent = fmt(totalLiquido);
+  }
+
+  (function(){
+    el('year').value = new Date().getFullYear();
+    ['calcBtn','year','salary','admission','advanced1','inssMonths'].forEach(id=> el(id).addEventListener('input', recalc));
+    el('calcBtn').addEventListener('click', recalc);
+    el('clearBtn').addEventListener('click', ()=>{document.querySelectorAll('input').forEach(i=>i.value=''); el('advanced1').value='nao'; el('inssMonths').value=0; recalc();});
+    recalc();
+  })();
+</script>
+</body>
+</html>
