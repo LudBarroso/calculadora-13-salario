@@ -43,10 +43,10 @@
       text-align: center;
       margin-top: 0;
       color: var(--cor-principal);
-      font-size: 1.6rem;
+      font-size: 1.7rem;
     }
 
-    p.descricao {
+    .subtitulo {
       text-align: center;
       font-size: 0.95rem;
       margin-bottom: 20px;
@@ -95,11 +95,18 @@
     }
 
     .botao:hover {
-      opacity: 0.92;
+      opacity: 0.94;
     }
 
-    .resultado {
+    .bloco-resultado {
       margin-top: 20px;
+      display: none;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      flex: 1 1 260px;
       padding: 16px;
       border-radius: 12px;
       background: var(--cor-secundaria);
@@ -108,7 +115,9 @@
       line-height: 1.5;
     }
 
-    .resultado strong {
+    .card h2 {
+      margin-top: 0;
+      font-size: 1rem;
       color: var(--cor-principal);
     }
 
@@ -123,19 +132,33 @@
       font-weight: 600;
     }
 
+    .valor-destaque {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--cor-destaque);
+    }
+
     .rodape {
       margin-top: 16px;
       font-size: 0.75rem;
       color: #666;
       text-align: center;
     }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 12px;
+        padding: 16px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Calculadora de 13º Salário – 2025</h1>
-    <p class="descricao">
-      Preencha os dados abaixo para ter uma estimativa do valor do seu 13º salário em 2025.
+    <p class="subtitulo">
+      Preencha os dados para ter uma estimativa do seu 13º em 2025.  
+      <br>É uma simulação, não substitui o cálculo oficial da empresa.
     </p>
 
     <div class="grid">
@@ -146,7 +169,12 @@
 
       <div>
         <label for="salario">Salário base (R$)</label>
-        <input type="number" id="salario" step="0.01" placeholder="Ex: 2500,00" />
+        <input
+          type="text"
+          id="salario"
+          placeholder="Ex: 2.500,00"
+          inputmode="decimal"
+        />
       </div>
 
       <div>
@@ -168,39 +196,93 @@
 
     <button class="botao" onclick="calcular13()">Calcular 13º</button>
 
-    <div id="resultado" class="resultado" style="display:none;"></div>
+    <div id="blocoResultado" class="bloco-resultado">
+      <div class="card" id="cardResumo"></div>
+      <div class="card" id="cardReceber"></div>
+    </div>
 
     <p class="rodape">
-      Esta é uma simulação aproximada, sem considerar situações específicas de cada empresa ou acordo coletivo.
+      Cálculo aproximado com base em tabelas de INSS e IR de 2025.  
+      Sempre confira os valores oficiais com o Departamento Pessoal / RH.
     </p>
   </div>
 
   <script>
+    function parseValorMonetario(texto) {
+      if (!texto) return NaN;
+      // remove espaços
+      let valor = texto.toString().trim();
+      // remove separador de milhar (.)
+      valor = valor.replace(/\./g, "");
+      // troca vírgula decimal por ponto
+      valor = valor.replace(",", ".");
+      return parseFloat(valor);
+    }
+
+    function calcularINSS2025(base) {
+      if (base <= 0 || isNaN(base)) return 0;
+      const teto = 8157.41;
+      const valor = Math.min(base, teto);
+
+      const faixas = [
+        { limite: 1518.00, aliq: 0.075, ded: 0.00 },
+        { limite: 2793.88, aliq: 0.09,  ded: 22.77 },
+        { limite: 4190.83, aliq: 0.12,  ded: 106.59 },
+        { limite: 8157.41, aliq: 0.14,  ded: 190.40 }
+      ];
+
+      for (let faixa of faixas) {
+        if (valor <= faixa.limite) {
+          const inss = valor * faixa.aliq - faixa.ded;
+          return inss < 0 ? 0 : inss;
+        }
+      }
+      return 0;
+    }
+
+    function calcularIR2025(base) {
+      if (base <= 0 || isNaN(base)) return 0;
+
+      const faixasIR = [
+        { limite: 2428.80, aliq: 0,     ded: 0 },
+        { limite: 2826.65, aliq: 0.075, ded: 182.16 },
+        { limite: 3751.05, aliq: 0.15,  ded: 394.16 },
+        { limite: 4664.68, aliq: 0.225, ded: 675.49 },
+        { limite: Infinity, aliq: 0.275, ded: 908.73 }
+      ];
+
+      for (let faixa of faixasIR) {
+        if (base <= faixa.limite) {
+          let ir = base * faixa.aliq - faixa.ded;
+          return ir < 0 ? 0 : ir;
+        }
+      }
+      return 0;
+    }
+
     function calcular13() {
       const admissaoStr = document.getElementById("admissao").value;
-      let salarioStr = document.getElementById("salario").value;
+      const salarioStr = document.getElementById("salario").value;
       const adiantou = document.getElementById("adiantou").value;
       const afastou = document.getElementById("inss").value;
-      const resultadoDiv = document.getElementById("resultado");
 
-      // validação simples
+      const cardResumo = document.getElementById("cardResumo");
+      const cardReceber = document.getElementById("cardReceber");
+      const blocoResultado = document.getElementById("blocoResultado");
+
       if (!admissaoStr || !salarioStr) {
         alert("Preencha a data de admissão e o salário base.");
         return;
       }
 
-      // troca vírgula por ponto, se a pessoa digitar assim
-      salarioStr = salarioStr.replace(",", ".");
-      const salario = parseFloat(salarioStr);
-
+      const salario = parseValorMonetario(salarioStr);
       if (isNaN(salario) || salario <= 0) {
-        alert("Informe um salário válido.");
+        alert("Informe um salário válido (ex: 2500 ou 2.500,00).");
         return;
       }
 
       const dataAdm = new Date(admissaoStr);
       const anoRef = 2025;
-
       let meses = 12;
 
       if (dataAdm.getFullYear() === anoRef) {
@@ -217,50 +299,85 @@
       if (meses < 0) meses = 0;
       if (meses > 12) meses = 12;
 
-      // se afastou pelo INSS em 2025, aqui estou simplificando: zera meses
       if (afastou === "sim") {
+        // simplificação: se afastou pelo INSS o ano todo, zera meses
         meses = 0;
       }
 
-      const decimoBruto = (salario / 12) * meses;
-      const primeiraParcela = decimoBruto / 2;
+      const decimoBruto = (salario * meses) / 12;
 
-      // tabela IR 2025 (exemplo aplicado ao 13º)
-      const faixasIR = [
-        { limite: 2259.20, aliq: 0,     ded: 0 },
-        { limite: 2826.65, aliq: 0.075, ded: 169.44 },
-        { limite: 3751.05, aliq: 0.15,  ded: 381.44 },
-        { limite: 4664.68, aliq: 0.225, ded: 662.77 },
-        { limite: Infinity, aliq: 0.275,ded: 896.00 }
-      ];
-
-      let ir = 0;
-      for (let faixa of faixasIR) {
-        if (decimoBruto <= faixa.limite) {
-          ir = decimoBruto * faixa.aliq - faixa.ded;
-          if (ir < 0) ir = 0;
-          break;
-        }
+      if (decimoBruto <= 0) {
+        blocoResultado.style.display = "flex";
+        cardResumo.innerHTML = `
+          <span class="tag">Atenção</span>
+          <h2>Sem direito ao 13º em 2025</h2>
+          <p>Com as informações informadas, não há meses válidos para cálculo de 13º salário em 2025.</p>
+        `;
+        cardReceber.innerHTML = `
+          <h2>Valor a receber agora</h2>
+          <p class="valor-destaque">R$ 0,00</p>
+        `;
+        return;
       }
 
-      // 2ª parcela: bruto - IR - (1ª já paga, se adiantou nas férias)
-      let segundaParcela = decimoBruto - ir;
+      // INSS sobre o 13º
+      const inss = calcularINSS2025(decimoBruto);
+
+      // IR sobre o 13º (base = 13º - INSS)
+      const baseIR = decimoBruto - inss;
+      const ir = calcularIR2025(baseIR);
+
+      const liquidoTotal = Math.max(decimoBruto - inss - ir, 0);
+
+      const primeiraTeorica = decimoBruto / 2;
+
+      let primeiraAgora;
+      let textoPrimeira;
       if (adiantou === "sim") {
-        segundaParcela -= primeiraParcela;
+        primeiraAgora = 0;
+        textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (já paga nas férias)`;
+      } else {
+        primeiraAgora = primeiraTeorica;
+        textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (a receber)`;
       }
-      if (segundaParcela < 0) segundaParcela = 0;
 
-      const total = primeiraParcela + segundaParcela;
+      let segundaAgora;
+      let textoSegundaObs = "";
 
-      resultadoDiv.style.display = "block";
-      resultadoDiv.innerHTML = `
-        <span class="tag">Simulação 2025</span><br>
-        <strong>Meses contabilizados em 2025:</strong> ${meses}<br><br>
-        <strong>13º bruto:</strong> R$ ${decimoBruto.toFixed(2)}<br>
-        <strong>1ª parcela (bruta):</strong> R$ ${primeiraParcela.toFixed(2)}<br>
-        <strong>Desconto de IR sobre o 13º:</strong> R$ ${ir.toFixed(2)}<br>
-        <strong>2ª parcela:</strong> R$ ${segundaParcela.toFixed(2)}<br><br>
-        <strong>Total estimado do 13º em 2025:</strong> R$ ${total.toFixed(2)}
+      if (adiantou === "sim") {
+        segundaAgora = liquidoTotal;
+        textoSegundaObs = "Considerando que todos os descontos (INSS + IR) são ajustados agora.";
+      } else {
+        segundaAgora = liquidoTotal - primeiraTeorica;
+        if (segundaAgora < 0) segundaAgora = 0;
+        textoSegundaObs = "A 2ª parcela já vem com os descontos de INSS e IR.";
+      }
+
+      const totalAgora = primeiraAgora + segundaAgora;
+      const totalLiquidoAno = liquidoTotal;
+      const totalBrutoAno = decimoBruto;
+
+      blocoResultado.style.display = "flex";
+
+      cardResumo.innerHTML = `
+        <span class="tag">Resumo do 13º em 2025</span>
+        <h2>Valores do 13º</h2>
+        <p><strong>Meses contabilizados:</strong> ${meses}</p>
+        <p><strong>13º bruto:</strong> R$ ${totalBrutoAno.toFixed(2)}</p>
+        <p><strong>Desconto de INSS sobre o 13º:</strong> R$ ${inss.toFixed(2)}</p>
+        <p><strong>Desconto de IR sobre o 13º:</strong> R$ ${ir.toFixed(2)}</p>
+        <p><strong>13º líquido total (após impostos):</strong> R$ ${totalLiquidoAno.toFixed(2)}</p>
+      `;
+
+      cardReceber.innerHTML = `
+        <span class="tag">O que você recebe na prática</span>
+        <h2>Parcelas do 13º</h2>
+        <p><strong>1ª parcela:</strong> ${textoPrimeira}</p>
+        <p><strong>2ª parcela (líquida):</strong> R$ ${segundaAgora.toFixed(2)}<br>
+        <small>${textoSegundaObs}</small></p>
+        <hr>
+        <p><strong>Total a receber agora:</strong></p>
+        <p class="valor-destaque">R$ ${totalAgora.toFixed(2)}</p>
       `;
     }
   </script>
