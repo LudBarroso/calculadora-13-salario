@@ -210,11 +210,8 @@
   <script>
     function parseValorMonetario(texto) {
       if (!texto) return NaN;
-      // remove espaços
       let valor = texto.toString().trim();
-      // remove separador de milhar (.)
       valor = valor.replace(/\./g, "");
-      // troca vírgula decimal por ponto
       valor = valor.replace(",", ".");
       return parseFloat(valor);
     }
@@ -262,13 +259,13 @@
 
     function calcular13() {
       const admissaoStr = document.getElementById("admissao").value;
-      const salarioStr = document.getElementById("salario").value;
-      const adiantou = document.getElementById("adiantou").value;
-      const afastou = document.getElementById("inss").value;
+      const salarioStr  = document.getElementById("salario").value;
+      const adiantou    = document.getElementById("adiantou").value;
+      const afastou     = document.getElementById("inss").value;
 
-      const cardResumo = document.getElementById("cardResumo");
-      const cardReceber = document.getElementById("cardReceber");
-      const blocoResultado = document.getElementById("blocoResultado");
+      const cardResumo      = document.getElementById("cardResumo");
+      const cardReceber     = document.getElementById("cardReceber");
+      const blocoResultado  = document.getElementById("blocoResultado");
 
       if (!admissaoStr || !salarioStr) {
         alert("Preencha a data de admissão e o salário base.");
@@ -282,8 +279,8 @@
       }
 
       const dataAdm = new Date(admissaoStr);
-      const anoRef = 2025;
-      let meses = 12;
+      const anoRef  = 2025;
+      let meses     = 12;
 
       if (dataAdm.getFullYear() === anoRef) {
         meses = 12 - dataAdm.getMonth();
@@ -300,8 +297,7 @@
       if (meses > 12) meses = 12;
 
       if (afastou === "sim") {
-        // simplificação: se afastou pelo INSS o ano todo, zera meses
-        meses = 0;
+        meses = 0; // simplificação
       }
 
       const decimoBruto = (salario * meses) / 12;
@@ -320,42 +316,43 @@
         return;
       }
 
-      // INSS sobre o 13º
-      const inss = calcularINSS2025(decimoBruto);
-
-      // IR sobre o 13º (base = 13º - INSS)
+      const inss   = calcularINSS2025(decimoBruto);
       const baseIR = decimoBruto - inss;
-      const ir = calcularIR2025(baseIR);
+      const ir     = calcularIR2025(baseIR);
 
       const liquidoTotal = Math.max(decimoBruto - inss - ir, 0);
-
       const primeiraTeorica = decimoBruto / 2;
 
       let primeiraAgora;
       let textoPrimeira;
+      let segundaAgora;
+      let textoSegundaObs;
+
       if (adiantou === "sim") {
+        // 1ª já foi paga nas férias → não entra no "a receber agora"
         primeiraAgora = 0;
         textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (já paga nas férias)`;
-      } else {
-        primeiraAgora = primeiraTeorica;
-        textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (a receber)`;
-      }
 
-      let segundaAgora;
-      let textoSegundaObs = "";
-
-      if (adiantou === "sim") {
-        segundaAgora = liquidoTotal;
-        textoSegundaObs = "Considerando que todos os descontos (INSS + IR) são ajustados agora.";
-      } else {
+        // Em dezembro recebe apenas o líquido total menos o que já foi adiantado
         segundaAgora = liquidoTotal - primeiraTeorica;
         if (segundaAgora < 0) segundaAgora = 0;
+
+        textoSegundaObs = "Valor líquido da 2ª parcela já descontando o que foi adiantado nas férias.";
+      } else {
+        // Não adiantou: 1ª parcela ainda será paga
+        primeiraAgora = primeiraTeorica;
+        textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (a receber)`;
+
+        // 2ª = líquido total - 1ª parcela
+        segundaAgora = liquidoTotal - primeiraTeorica;
+        if (segundaAgora < 0) segundaAgora = 0;
+
         textoSegundaObs = "A 2ª parcela já vem com os descontos de INSS e IR.";
       }
 
-      const totalAgora = primeiraAgora + segundaAgora;
-      const totalLiquidoAno = liquidoTotal;
-      const totalBrutoAno = decimoBruto;
+      const totalAgora       = primeiraAgora + segundaAgora;
+      const totalLiquidoAno  = liquidoTotal;
+      const totalBrutoAno    = decimoBruto;
 
       blocoResultado.style.display = "flex";
 
