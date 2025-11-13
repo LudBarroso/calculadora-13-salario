@@ -1,64 +1,268 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Calculadora de 13º Salário 2025</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
- body { font-family: Arial; background:#f2f5ff; margin:0; padding:20px; }
- .card { max-width: 750px; margin:auto; background:white; padding:25px; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.1); }
- h2 { color:#004aad; text-align:center; }
- label { font-weight:bold; margin-top:10px; display:block; }
- input, select { width:100%; padding:10px; border-radius:8px; border:1px solid #bbb; margin-top:5px; }
- button { width:100%; margin-top:20px; padding:12px; background:#004aad; color:white; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
- button:hover { background:#00327A; }
- .resultado { background:#e8f0ff; padding:15px; border-radius:10px; margin-top:20px; }
-</style>
-</head>
-
-<body>
-
-<div class="card">
-<h2>Calculadora de 13º Salário – 2025</h2>
-
-<label>Data de admissão:</label>
-<input type="date" id="admissao">
-
-<label>Salário base (R$):</label>
-<input type="number" id="salario" step="0.01">
-
-<label>Você adiantou 1ª parcela nas férias?</label>
-<select id="adiantou">
-  <option value="nao">Não</option>
-  <option value="sim">Sim</option>
-</select>
-
-<label>Afastou pelo INSS em 2025?</label>
-<select id="inss">
-  <option value="nao">Não</option>
-  <option value="sim">Sim</option>
-</select>
-
-<button onclick="calcular()">Calcular</button>
-
-<div id="resultado" class="resultado" style="display:none;"></div>
-
-</div>
-
-<script>
-function calcular() {
-
-    const dataAdm = new Date(document.getElementById("admissao").value);
-    const salario = parseFloat(document.getElementById("salario").value);
-    const adiantou = document.getElementById("adiantou").value;
-    const afastou = document.getElementById("inss").value;
-
-    if (!dataAdm || !salario) {
-        alert("Preencha todos os campos!");
-        return;
+  <meta charset="UTF-8" />
+  <title>Calculadora de 13º Salário 2025</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --cor-principal: #004aad;
+      --cor-secundaria: #f5f7fb;
+      --cor-destaque: #00b894;
+      --cor-texto: #333;
     }
 
-    // Calcular meses trabalhados em 2025
-    let meses = 12 - dataAdm.getMonth();
-    if (dataAdm.getDate() > 15) meses -= 1;
-    if (meses < 0) m
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #eef3ff, #ffffff);
+      color: var(--cor-texto);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 24px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      color: var(--cor-principal);
+      font-size: 1.6rem;
+    }
+
+    p.descricao {
+      text-align: center;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d0d7e2;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.2s;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--cor-principal);
+    }
+
+    .botao {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 999px;
+      background: var(--cor-principal);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .botao:hover {
+      opacity: 0.92;
+    }
+
+    .resultado {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--cor-secundaria);
+      border: 1px solid #d0d7e2;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .resultado strong {
+      color: var(--cor-principal);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #e3f8f0;
+      color: #047857;
+      font-size: 0.75rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .rodape {
+      margin-top: 16px;
+      font-size: 0.75rem;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calculadora de 13º Salário – 2025</h1>
+    <p class="descricao">
+      Preencha os dados abaixo para ter uma estimativa do valor do seu 13º salário em 2025.
+    </p>
+
+    <div class="grid">
+      <div>
+        <label for="admissao">Data de admissão</label>
+        <input type="date" id="admissao" />
+      </div>
+
+      <div>
+        <label for="salario">Salário base (R$)</label>
+        <input type="number" id="salario" step="0.01" placeholder="Ex: 2500,00" />
+      </div>
+
+      <div>
+        <label for="adiantou">Adiantou 1ª parcela nas férias?</label>
+        <select id="adiantou">
+          <option value="nao">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="inss">Afastou pelo INSS em 2025?</label>
+        <select id="inss">
+          <option value="nao">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="botao" onclick="calcular13()">Calcular 13º</button>
+
+    <div id="resultado" class="resultado" style="display:none;"></div>
+
+    <p class="rodape">
+      Esta é uma simulação aproximada, sem considerar situações específicas de cada empresa ou acordo coletivo.
+    </p>
+  </div>
+
+  <script>
+    function calcular13() {
+      const admissaoStr = document.getElementById("admissao").value;
+      let salarioStr = document.getElementById("salario").value;
+      const adiantou = document.getElementById("adiantou").value;
+      const afastou = document.getElementById("inss").value;
+      const resultadoDiv = document.getElementById("resultado");
+
+      // validação simples
+      if (!admissaoStr || !salarioStr) {
+        alert("Preencha a data de admissão e o salário base.");
+        return;
+      }
+
+      // troca vírgula por ponto, se a pessoa digitar assim
+      salarioStr = salarioStr.replace(",", ".");
+      const salario = parseFloat(salarioStr);
+
+      if (isNaN(salario) || salario <= 0) {
+        alert("Informe um salário válido.");
+        return;
+      }
+
+      const dataAdm = new Date(admissaoStr);
+      const anoRef = 2025;
+
+      let meses = 12;
+
+      if (dataAdm.getFullYear() === anoRef) {
+        meses = 12 - dataAdm.getMonth();
+        if (dataAdm.getDate() > 15) {
+          meses -= 1;
+        }
+      } else if (dataAdm.getFullYear() > anoRef) {
+        meses = 0;
+      } else if (dataAdm.getFullYear() < anoRef) {
+        meses = 12;
+      }
+
+      if (meses < 0) meses = 0;
+      if (meses > 12) meses = 12;
+
+      // se afastou pelo INSS em 2025, aqui estou simplificando: zera meses
+      if (afastou === "sim") {
+        meses = 0;
+      }
+
+      const decimoBruto = (salario / 12) * meses;
+      const primeiraParcela = decimoBruto / 2;
+
+      // tabela IR 2025 (exemplo aplicado ao 13º)
+      const faixasIR = [
+        { limite: 2259.20, aliq: 0,     ded: 0 },
+        { limite: 2826.65, aliq: 0.075, ded: 169.44 },
+        { limite: 3751.05, aliq: 0.15,  ded: 381.44 },
+        { limite: 4664.68, aliq: 0.225, ded: 662.77 },
+        { limite: Infinity, aliq: 0.275,ded: 896.00 }
+      ];
+
+      let ir = 0;
+      for (let faixa of faixasIR) {
+        if (decimoBruto <= faixa.limite) {
+          ir = decimoBruto * faixa.aliq - faixa.ded;
+          if (ir < 0) ir = 0;
+          break;
+        }
+      }
+
+      // 2ª parcela: bruto - IR - (1ª já paga, se adiantou nas férias)
+      let segundaParcela = decimoBruto - ir;
+      if (adiantou === "sim") {
+        segundaParcela -= primeiraParcela;
+      }
+      if (segundaParcela < 0) segundaParcela = 0;
+
+      const total = primeiraParcela + segundaParcela;
+
+      resultadoDiv.style.display = "block";
+      resultadoDiv.innerHTML = `
+        <span class="tag">Simulação 2025</span><br>
+        <strong>Meses contabilizados em 2025:</strong> ${meses}<br><br>
+        <strong>13º bruto:</strong> R$ ${decimoBruto.toFixed(2)}<br>
+        <strong>1ª parcela (bruta):</strong> R$ ${primeiraParcela.toFixed(2)}<br>
+        <strong>Desconto de IR sobre o 13º:</strong> R$ ${ir.toFixed(2)}<br>
+        <strong>2ª parcela:</strong> R$ ${segundaParcela.toFixed(2)}<br><br>
+        <strong>Total estimado do 13º em 2025:</strong> R$ ${total.toFixed(2)}
+      `;
+    }
+  </script>
+</body>
+</html>
