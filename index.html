@@ -2,381 +2,96 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Calculadora de 13º Salário 2025</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora de Aviso Prévio</title>
+
   <style>
-    :root {
-      --cor-principal: #004aad;
-      --cor-secundaria: #f5f7fb;
-      --cor-destaque: #00b894;
-      --cor-texto: #333;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #eef3ff, #ffffff);
-      color: var(--cor-texto);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 900px;
-      width: 100%;
-      margin: 24px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-      padding: 24px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-top: 0;
-      color: var(--cor-principal);
-      font-size: 1.7rem;
-    }
-
-    .subtitulo {
-      text-align: center;
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: block;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #d0d7e2;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border 0.2s;
-      background: #fff;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--cor-principal);
-    }
-
-    .botao {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 999px;
-      background: var(--cor-principal);
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-
-    .botao:hover {
-      opacity: 0.94;
-    }
-
-    .bloco-resultado {
-      margin-top: 20px;
-      display: none;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .card {
-      flex: 1 1 260px;
-      padding: 16px;
-      border-radius: 12px;
-      background: var(--cor-secundaria);
-      border: 1px solid #d0d7e2;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .card h2 {
-      margin-top: 0;
-      font-size: 1rem;
-      color: var(--cor-principal);
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 999px;
-      background: #e3f8f0;
-      color: #047857;
-      font-size: 0.75rem;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .valor-destaque {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--cor-destaque);
-    }
-
-    .rodape {
-      margin-top: 16px;
-      font-size: 0.75rem;
-      color: #666;
-      text-align: center;
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        margin: 12px;
-        padding: 16px;
-      }
-    }
+    body{font-family:Arial,sans-serif;background:#f4f6f8;padding:20px}
+    .container{max-width:420px;margin:auto;background:#fff;padding:25px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.1)}
+    h2{text-align:center;margin-bottom:20px}
+    label{display:block;margin-top:15px;font-weight:bold}
+    input,select,button{width:100%;padding:10px;margin-top:5px;font-size:16px}
+    button{margin-top:20px;background:#007bff;color:#fff;border:none;border-radius:5px;cursor:pointer}
+    button:hover{background:#0056b3}
+    .resultado{margin-top:20px;padding:15px;background:#eef2f7;border-radius:5px;min-height:24px}
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>Calculadora de 13º Salário – 2025</h1>
-    <p class="subtitulo">
-      Preencha os dados para ter uma estimativa do seu 13º em 2025.  
-      <br>É uma simulação, não substitui o cálculo oficial da empresa.
-    </p>
+    <h2>Calculadora de Aviso Prévio</h2>
 
-    <div class="grid">
-      <div>
-        <label for="admissao">Data de admissão</label>
-        <input type="date" id="admissao" />
-      </div>
+    <label>Data do desligamento</label>
+    <input type="date" id="dataDesligamento" />
 
-      <div>
-        <label for="salario">Salário base (R$)</label>
-        <input
-          type="text"
-          id="salario"
-          placeholder="Ex: 2.500,00"
-          inputmode="decimal"
-        />
-      </div>
+    <label>Tipo de aviso</label>
+    <select id="tipoAviso">
+      <option value="">Selecione</option>
+      <option value="trabalhado">Aviso Trabalhado</option>
+      <option value="indenizado">Aviso Indenizado</option>
+    </select>
 
-      <div>
-        <label for="adiantou">Adiantou 1ª parcela nas férias?</label>
-        <select id="adiantou">
-          <option value="nao">Não</option>
-          <option value="sim">Sim</option>
-        </select>
-      </div>
+    <label>Data-base</label>
+    <input type="date" id="dataBase" />
 
-      <div>
-        <label for="inss">Afastou pelo INSS em 2025?</label>
-        <select id="inss">
-          <option value="nao">Não</option>
-          <option value="sim">Sim</option>
-        </select>
-      </div>
-    </div>
+    <button type="button" id="btnCalcular">Calcular</button>
 
-    <button class="botao" onclick="calcular13()">Calcular 13º</button>
-
-    <div id="blocoResultado" class="bloco-resultado">
-      <div class="card" id="cardResumo"></div>
-      <div class="card" id="cardReceber"></div>
-    </div>
-
-    <p class="rodape">
-      Cálculo aproximado com base em tabelas de INSS e IR de 2025.  
-      Sempre confira os valores oficiais com o Departamento Pessoal / RH.
-    </p>
+    <div class="resultado" id="resultado"></div>
   </div>
 
   <script>
-    function parseValorMonetario(texto) {
-      if (!texto) return NaN;
-      let valor = texto.toString().trim();
-      valor = valor.replace(/\./g, "");
-      valor = valor.replace(",", ".");
-      return parseFloat(valor);
+    // Parse seguro para Safari/iPhone: "YYYY-MM-DD" -> Date local (sem UTC)
+    function parseDateLocal(yyyyMmDd) {
+      const [y, m, d] = yyyyMmDd.split("-").map(Number);
+      return new Date(y, m - 1, d); // local time
     }
 
-    function calcularINSS2025(base) {
-      if (base <= 0 || isNaN(base)) return 0;
-      const teto = 8157.41;
-      const valor = Math.min(base, teto);
-
-      const faixas = [
-        { limite: 1518.00, aliq: 0.075, ded: 0.00 },
-        { limite: 2793.88, aliq: 0.09,  ded: 22.77 },
-        { limite: 4190.83, aliq: 0.12,  ded: 106.59 },
-        { limite: 8157.41, aliq: 0.14,  ded: 190.40 }
-      ];
-
-      for (let faixa of faixas) {
-        if (valor <= faixa.limite) {
-          const inss = valor * faixa.aliq - faixa.ded;
-          return inss < 0 ? 0 : inss;
-        }
-      }
-      return 0;
+    function formatBR(dateObj) {
+      return dateObj.toLocaleDateString("pt-BR");
     }
 
-    function calcularIR2025(base) {
-      if (base <= 0 || isNaN(base)) return 0;
-
-      const faixasIR = [
-        { limite: 2428.80, aliq: 0,     ded: 0 },
-        { limite: 2826.65, aliq: 0.075, ded: 182.16 },
-        { limite: 3751.05, aliq: 0.15,  ded: 394.16 },
-        { limite: 4664.68, aliq: 0.225, ded: 675.49 },
-        { limite: Infinity, aliq: 0.275, ded: 908.73 }
-      ];
-
-      for (let faixa of faixasIR) {
-        if (base <= faixa.limite) {
-          let ir = base * faixa.aliq - faixa.ded;
-          return ir < 0 ? 0 : ir;
-        }
-      }
-      return 0;
+    function addDays(dateObj, days) {
+      const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+      d.setDate(d.getDate() + days);
+      return d;
     }
 
-    function calcular13() {
-      const admissaoStr = document.getElementById("admissao").value;
-      const salarioStr  = document.getElementById("salario").value;
-      const adiantou    = document.getElementById("adiantou").value;
-      const afastou     = document.getElementById("inss").value;
+    function calcularAviso() {
+      const deslig = document.getElementById("dataDesligamento").value;
+      const tipo = document.getElementById("tipoAviso").value;
+      const base = document.getElementById("dataBase").value;
+      const resultado = document.getElementById("resultado");
 
-      const cardResumo      = document.getElementById("cardResumo");
-      const cardReceber     = document.getElementById("cardReceber");
-      const blocoResultado  = document.getElementById("blocoResultado");
-
-      if (!admissaoStr || !salarioStr) {
-        alert("Preencha a data de admissão e o salário base.");
+      if (!deslig || !tipo || !base) {
+        resultado.innerHTML = "⚠️ Preencha todos os campos.";
         return;
       }
 
-      const salario = parseValorMonetario(salarioStr);
-      if (isNaN(salario) || salario <= 0) {
-        alert("Informe um salário válido (ex: 2500 ou 2.500,00).");
-        return;
+      const dataDesligamento = parseDateLocal(deslig);
+      const dataBase = parseDateLocal(base);
+
+      let dataFinal = dataDesligamento;
+      if (tipo === "trabalhado") {
+        dataFinal = addDays(dataDesligamento, 30);
       }
 
-      const dataAdm = new Date(admissaoStr);
-      const anoRef  = 2025;
-      let meses     = 12;
+      const inicioPeriodo = addDays(dataBase, -30);
 
-      if (dataAdm.getFullYear() === anoRef) {
-        meses = 12 - dataAdm.getMonth();
-        if (dataAdm.getDate() > 15) {
-          meses -= 1;
-        }
-      } else if (dataAdm.getFullYear() > anoRef) {
-        meses = 0;
-      } else if (dataAdm.getFullYear() < anoRef) {
-        meses = 12;
-      }
+      let msg = `
+        📅 <strong>Data final do aviso:</strong><br>
+        ${formatBR(dataFinal)}<br><br>
+      `;
 
-      if (meses < 0) meses = 0;
-      if (meses > 12) meses = 12;
-
-      if (afastou === "sim") {
-        meses = 0; // simplificação
-      }
-
-      const decimoBruto = (salario * meses) / 12;
-
-      if (decimoBruto <= 0) {
-        blocoResultado.style.display = "flex";
-        cardResumo.innerHTML = `
-          <span class="tag">Atenção</span>
-          <h2>Sem direito ao 13º em 2025</h2>
-          <p>Com as informações informadas, não há meses válidos para cálculo de 13º salário em 2025.</p>
-        `;
-        cardReceber.innerHTML = `
-          <h2>Valor a receber agora</h2>
-          <p class="valor-destaque">R$ 0,00</p>
-        `;
-        return;
-      }
-
-      const inss   = calcularINSS2025(decimoBruto);
-      const baseIR = decimoBruto - inss;
-      const ir     = calcularIR2025(baseIR);
-
-      const liquidoTotal = Math.max(decimoBruto - inss - ir, 0);
-      const primeiraTeorica = decimoBruto / 2;
-
-      let primeiraAgora;
-      let textoPrimeira;
-      let segundaAgora;
-      let textoSegundaObs;
-
-      if (adiantou === "sim") {
-        // 1ª já foi paga nas férias → não entra no "a receber agora"
-        primeiraAgora = 0;
-        textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (já paga nas férias)`;
-
-        // Em dezembro recebe apenas o líquido total menos o que já foi adiantado
-        segundaAgora = liquidoTotal - primeiraTeorica;
-        if (segundaAgora < 0) segundaAgora = 0;
-
-        textoSegundaObs = "Valor líquido da 2ª parcela já descontando o que foi adiantado nas férias.";
+      if (dataFinal >= inicioPeriodo && dataFinal <= dataBase) {
+        msg += "🚨 <strong>O aviso cai no período da data-base (30 dias antes).</strong>";
       } else {
-        // Não adiantou: 1ª parcela ainda será paga
-        primeiraAgora = primeiraTeorica;
-        textoPrimeira = `R$ ${primeiraTeorica.toFixed(2)} (a receber)`;
-
-        // 2ª = líquido total - 1ª parcela
-        segundaAgora = liquidoTotal - primeiraTeorica;
-        if (segundaAgora < 0) segundaAgora = 0;
-
-        textoSegundaObs = "A 2ª parcela já vem com os descontos de INSS e IR.";
+        msg += "✅ <strong>O aviso NÃO cai no período da data-base.</strong>";
       }
 
-      const totalAgora       = primeiraAgora + segundaAgora;
-      const totalLiquidoAno  = liquidoTotal;
-      const totalBrutoAno    = decimoBruto;
-
-      blocoResultado.style.display = "flex";
-
-      cardResumo.innerHTML = `
-        <span class="tag">Resumo do 13º em 2025</span>
-        <h2>Valores do 13º</h2>
-        <p><strong>Meses contabilizados:</strong> ${meses}</p>
-        <p><strong>13º bruto:</strong> R$ ${totalBrutoAno.toFixed(2)}</p>
-        <p><strong>Desconto de INSS sobre o 13º:</strong> R$ ${inss.toFixed(2)}</p>
-        <p><strong>Desconto de IR sobre o 13º:</strong> R$ ${ir.toFixed(2)}</p>
-        <p><strong>13º líquido total (após impostos):</strong> R$ ${totalLiquidoAno.toFixed(2)}</p>
-      `;
-
-      cardReceber.innerHTML = `
-        <span class="tag">O que você recebe na prática</span>
-        <h2>Parcelas do 13º</h2>
-        <p><strong>1ª parcela:</strong> ${textoPrimeira}</p>
-        <p><strong>2ª parcela (líquida):</strong> R$ ${segundaAgora.toFixed(2)}<br>
-        <small>${textoSegundaObs}</small></p>
-        <hr>
-        <p><strong>Total a receber agora:</strong></p>
-        <p class="valor-destaque">R$ ${totalAgora.toFixed(2)}</p>
-      `;
+      resultado.innerHTML = msg;
     }
+
+    document.getElementById("btnCalcular").addEventListener("click", calcularAviso);
   </script>
 </body>
 </html>
